@@ -1,36 +1,22 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
+import { promise } from "remote-origin-url";
 
 const ToDoList = () => {
 	const [todos, setTodos] = useState([]);
 	const [task, setTask] = useState("");
 
 	const AddTask = () => {
-		const newTodos = todos.concat({ label: task, done: false });
+		const newTodos = todos.concat({
+			label: task,
+			done: false,
+			id: Math.random() * 10
+		});
 		setTodos(newTodos);
 	};
-
-	const deleteTask = taskDone => {
-		const removeTask = todos.filter(task => task.done != taskDone);
+	const deleteTask = taskId => {
+		const removeTask = todos.filter(task => task.id != taskId);
 		setTodos(removeTask);
-	};
-	const deleteAll = () => {
-		const deleteMethod = {
-			method: "DELETE", // Method itself
-			headers: {
-				"Content-type": "application/json; charset=UTF-8" // Indicates the content
-			}
-			// No need to have body, because we don't send nothing to the server.
-		};
-		useEffect(() => {
-			fetch(
-				"https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR",
-				deleteMethod
-			)
-				.then(response => response.json())
-				.then(data => console.log(data)) // Manipulate the data retrieved back, if we want to do something with it
-				.catch(err => console.log(err)); // Do something with the error
-		}, [todos]);
 	};
 
 	// GET //
@@ -66,6 +52,29 @@ const ToDoList = () => {
 				console.log(error);
 			});
 	}, [todos]);
+
+	// function deleteAll() {
+	// 	if (task === todos.id) {
+	// 		useEffect(() => {
+	// 			const deleteMethod = {
+	// 				method: "DELETE", // Method itself
+	// 				headers: {
+	// 					"Content-type": "application/json" // Indicates the content
+	// 				}
+	// 				// No need to have body, because we don't send nothing to the server.
+	// 			};
+	// 			// Make the HTTP Delete call using fetch api
+	// 			fetch(
+	// 				"https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR",
+	// 				deleteMethod
+	// 			)
+	// 				.then(res => res.json())
+	// 				.then(data => console.log(data)) // Manipulate the data retrieved back, if we want to do something with it
+	// 				.catch(err => console.log(err)); // Do something with the error
+	// 		}),
+	// 			[];
+	// 	}
+	// }
 	return (
 		<div>
 			<input
@@ -76,13 +85,13 @@ const ToDoList = () => {
 				}}
 			/>
 			<button onClick={AddTask}>Add</button>
-			<button onClick={deleteAll}>Delete All</button>
+			{/* <button onClick={deleteAll(todos.id)}>Delete All</button> */}
 			<ul>
-				{todos.map((todo, done) => {
+				{todos.map(todo => {
 					return (
-						<li key={todos.indexOf(todo)}>
+						<li key={todos.id}>
 							{todo.label}
-							<button onClick={() => deleteTask(todo.done)}>
+							<button onClick={() => deleteTask(todo.id)}>
 								X
 							</button>
 						</li>
