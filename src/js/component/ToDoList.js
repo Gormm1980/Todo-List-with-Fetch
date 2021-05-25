@@ -9,15 +9,34 @@ const ToDoList = () => {
 	const AddTask = () => {
 		const newTodos = todos.concat({
 			label: task,
-			done: false,
-			id: Math.random() * 10
+			done: false
+			// id: Math.random() * 10
 		});
 		setTodos(newTodos);
 	};
-	const deleteTask = taskId => {
-		const removeTask = todos.filter(task => task.id != taskId);
-		setTodos(removeTask);
-	};
+	function deleteTodo(elementIndex) {
+		let filtered = todos.filter(function(todos, index) {
+			return elementIndex !== index;
+		});
+		setTodos(filtered);
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR", {
+			method: "PUT",
+			body: JSON.stringify(filtered),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+			.then(resp => {
+				return resp.json();
+			})
+			.then(data => {
+				console.log(data);
+			})
+			.catch(error => {
+				console.log(error);
+			});
+		console.log(filtered);
+	}
 
 	// GET //
 
@@ -28,53 +47,31 @@ const ToDoList = () => {
 			.catch(error => console.log(error));
 	}, []);
 
-	// PUT//
-	useEffect(() => {
-		fetch("https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR", {
-			method: "PUT",
-			body: JSON.stringify(todos),
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
-			.then(resp => {
-				console.log(resp.ok); // will be true if the response is successfull
-				console.log(resp.status); // the status code = 200 or code = 400 etc.
-				console.log(resp.text()); // will try return the exact result as string
-				return resp.json(); // (returns promise) will try to parse the result as json as return a promise that you can .then for results
-			})
-			.then(data => {
-				//here is were your code should start after the fetch finishes
-				console.log(data); //this will print on the console the exact object received from the server
-			})
-			.catch(error => {
-				//error handling
-				console.log(error);
-			});
-	}, [todos]);
+	function deleteAll() {
+		let deleteFull = todos.filter(function(todos, index) {
+			return !remove.includes(todos.index);
+		});
+		setTodos(deleteFull);
 
-	// function deleteAll() {
-	// 	if (task === todos.id) {
-	// 		useEffect(() => {
-	// 			const deleteMethod = {
-	// 				method: "DELETE", // Method itself
-	// 				headers: {
-	// 					"Content-type": "application/json" // Indicates the content
-	// 				}
-	// 				// No need to have body, because we don't send nothing to the server.
-	// 			};
-	// 			// Make the HTTP Delete call using fetch api
-	// 			fetch(
-	// 				"https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR",
-	// 				deleteMethod
-	// 			)
-	// 				.then(res => res.json())
-	// 				.then(data => console.log(data)) // Manipulate the data retrieved back, if we want to do something with it
-	// 				.catch(err => console.log(err)); // Do something with the error
-	// 		}),
-	// 			[];
-	// 	}
-	// }
+		const deleteMethod = {
+			method: "DELETE", // Method itself
+			headers: { "Content-Type": "application/json" },
+			body: null
+		};
+		// Make the HTTP Delete call using fetch api
+
+		fetch(
+			"https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR",
+			deleteMethod
+		)
+			.then(res => res.json())
+			.then(data =>
+				// let newTodos = [...todos].splice(0, todos.length);
+				// setTodos(data),
+				console.log(data)
+			) // Manipulate the data retrieved back, if we want to do something with it
+			.catch(err => console.log(err)); // Do something with the error
+	}
 	return (
 		<div>
 			<input
@@ -85,19 +82,18 @@ const ToDoList = () => {
 				}}
 			/>
 			<button onClick={AddTask}>Add</button>
-			{/* <button onClick={deleteAll(todos.id)}>Delete All</button> */}
+
 			<ul>
-				{todos.map(todo => {
+				{todos.map((todo, index) => {
 					return (
-						<li key={todos.id}>
+						<li key={index}>
 							{todo.label}
-							<button onClick={() => deleteTask(todo.id)}>
-								X
-							</button>
+							<button onClick={() => deleteTodo(index)}>X</button>
 						</li>
 					);
 				})}
 			</ul>
+			<button onClick={deleteAll}>Delete All</button>
 		</div>
 	);
 };
