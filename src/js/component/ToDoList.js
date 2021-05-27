@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { promise } from "remote-origin-url";
 
 const ToDoList = () => {
 	const [todos, setTodos] = useState([]);
@@ -10,14 +9,19 @@ const ToDoList = () => {
 		const newTodos = todos.concat({
 			label: task,
 			done: false
-			// id: Math.random() * 10
 		});
 		setTodos(newTodos);
 	};
-	function deleteTodo(elementIndex) {
-		let filtered = todos.filter(function(todos, index) {
+
+	const deleteToDoList = () => {
+		const removeTodolist = [];
+		setTodos(removeTodolist);
+	};
+	function deleteTask(elementIndex) {
+		let filtered = todos.filter(function(todo, index) {
 			return elementIndex !== index;
 		});
+		console.log("filtered", filtered);
 		setTodos(filtered);
 		fetch("https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR", {
 			method: "PUT",
@@ -35,43 +39,20 @@ const ToDoList = () => {
 			.catch(error => {
 				console.log(error);
 			});
-		console.log(filtered);
+		console.log("filtered");
 	}
 
 	// GET //
-
-	useEffect(() => {
+	function getToDo() {
 		fetch("https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR")
 			.then(res => res.json())
-			.then(json => setTodos(json))
-			.catch(error => console.log(error));
+			.then(data => setTodos(data));
+	}
+
+	useEffect(() => {
+		getToDo();
 	}, []);
 
-	function deleteAll() {
-		let deleteFull = todos.filter(function(todos, index) {
-			return !remove.includes(todos.index);
-		});
-		setTodos(deleteFull);
-
-		const deleteMethod = {
-			method: "DELETE", // Method itself
-			headers: { "Content-Type": "application/json" },
-			body: null
-		};
-		// Make the HTTP Delete call using fetch api
-
-		fetch(
-			"https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR",
-			deleteMethod
-		)
-			.then(res => res.json())
-			.then(data =>
-				// let newTodos = [...todos].splice(0, todos.length);
-				// setTodos(data),
-				console.log(data)
-			) // Manipulate the data retrieved back, if we want to do something with it
-			.catch(err => console.log(err)); // Do something with the error
-	}
 	return (
 		<div>
 			<input
@@ -82,18 +63,19 @@ const ToDoList = () => {
 				}}
 			/>
 			<button onClick={AddTask}>Add</button>
+			<button onClick={deleteToDoList}> Delete All</button>
 
 			<ul>
 				{todos.map((todo, index) => {
 					return (
 						<li key={index}>
 							{todo.label}
-							<button onClick={() => deleteTodo(index)}>X</button>
+							{todo.index}
+							<button onClick={() => deleteTask(index)}>X</button>
 						</li>
 					);
 				})}
 			</ul>
-			<button onClick={deleteAll}>Delete All</button>
 		</div>
 	);
 };
