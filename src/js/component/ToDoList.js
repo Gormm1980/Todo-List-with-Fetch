@@ -10,19 +10,56 @@ const ToDoList = () => {
 			label: task,
 			done: false
 		});
-		setTodos(newTodos);
+
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR", {
+			method: "PUT",
+			body: JSON.stringify(newTodos),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+			.then(resp => {
+				resp.json();
+			})
+			.then(data => {
+				console.log(data);
+				setTodos(newTodos);
+			})
+			.catch(error => {
+				console.log(error);
+			});
+		console.log("filtered");
 	};
 
 	const deleteToDoList = () => {
 		const removeTodolist = [];
-		setTodos(removeTodolist);
+
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR", {
+			method: "PUT",
+			body: JSON.stringify(removeTodolist),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+			.then(resp => {
+				resp.json();
+			})
+			.then(data => {
+				console.log(data);
+				setTodos(removeTodolist);
+			})
+			.catch(error => {
+				console.log(error);
+			});
+		console.log("filtered");
 	};
+
 	function deleteTask(elementIndex) {
 		let filtered = todos.filter(function(todo, index) {
 			return elementIndex !== index;
 		});
 		console.log("filtered", filtered);
-		setTodos(filtered);
+
 		fetch("https://assets.breatheco.de/apis/fake/todos/user/GuillermoSR", {
 			method: "PUT",
 			body: JSON.stringify(filtered),
@@ -31,10 +68,11 @@ const ToDoList = () => {
 			}
 		})
 			.then(resp => {
-				return resp.json();
+				resp.json();
 			})
 			.then(data => {
 				console.log(data);
+				setTodos(filtered);
 			})
 			.catch(error => {
 				console.log(error);
